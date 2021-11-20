@@ -12,10 +12,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(527, 275)
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+    def setupUi(self, mat_model):
+        mat_model.setObjectName("mat_model")
+        mat_model.resize(527, 275)
+        self.centralwidget = QtWidgets.QWidget(mat_model)
         self.centralwidget.setObjectName("centralwidget")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(65, 60, 51, 21))
@@ -66,21 +66,47 @@ class Ui_MainWindow(object):
         self.TText = QtWidgets.QTextEdit(self.centralwidget)
         self.TText.setGeometry(QtCore.QRect(430, 150, 41, 41))
         self.TText.setObjectName("TText")
-        MainWindow.setCentralWidget(self.centralwidget)
-        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        mat_model.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(mat_model)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 527, 26))
         self.menubar.setObjectName("menubar")
-        MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        mat_model.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(mat_model)
         self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
+        mat_model.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.uText.setHtml("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">x**4+sin(t)+4*x</p></body></html>")
+        self.yText.setHtml("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">x</p></body></html>")
+        self.AText.setHtml("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1</p></body></html>")
+        self.BText.setHtml("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">4</p></body></html>")
+        self.TText.setHtml("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">7</p></body></html>")
 
-    def retranslateUi(self, MainWindow):
+        self.retranslateUi(mat_model)
+        QtCore.QMetaObject.connectSlotsByName(mat_model)
+
+    def retranslateUi(self, mat_model):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        mat_model.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.label.setText(_translate("MainWindow", "L | G ="))
         self.comboBox.setItemText(0, _translate("MainWindow", "d^2/dt^2 + d/dx | (x**3/sqrt(4*pi*t))"))
         self.label_2.setText(_translate("MainWindow", "u(x,t) ="))
@@ -90,28 +116,83 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "T = "))
         self.label_6.setText(_translate("MainWindow", "Initial conditions"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
-        self.uText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">x**4+sin(t)+4*x</p></body></html>"))
-        self.yText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">x</p></body></html>"))
-        self.AText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1</p></body></html>"))
-        self.BText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">4</p></body></html>"))
-        self.TText.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">7</p></body></html>"))
+
+
+class MainModeMathModelingUI(object):
+    def setupUi(self, mat_model):
+        mat_model.setObjectName("mat_model")
+        mat_model.resize(527, 275)
+        self.centralwidget = QtWidgets.QWidget(mat_model)
+        self.centralwidget.setObjectName("centralwidget")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setGeometry(QtCore.QRect(65, 60, 51, 21))
+        self.label.setObjectName("label")
+        self.comboBox = QtWidgets.QComboBox(self.centralwidget)
+        self.comboBox.setGeometry(QtCore.QRect(130, 60, 221, 29))
+        self.comboBox.setObjectName("comboBox")
+        self.comboBox.addItem("")
+        self.comboBox.addItem("")
+        self.comboBox.setItemText(1, "")
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(60, 110, 61, 21))
+        self.label_2.setObjectName("label_2")
+
+        self.label_y = QtWidgets.QLabel(self.centralwidget)
+        self.label_y.setGeometry(QtCore.QRect(85, 160, 61, 21))
+        self.label_y.setObjectName("label_y")
+
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(390, 60, 31, 21))
+        self.label_3.setObjectName("label_3")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(390, 110, 31, 31))
+        self.label_4.setObjectName("label_4")
+        self.BText = QtWidgets.QTextEdit(self.centralwidget)
+        self.BText.setGeometry(QtCore.QRect(430, 100, 41, 41))
+        self.BText.setObjectName("BText")
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
+        self.label_5.setGeometry(QtCore.QRect(390, 160, 41, 21))
+        self.label_5.setObjectName("label_5")
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setGeometry(QtCore.QRect(210, 20, 141, 21))
+        self.label_6.setObjectName("label_6")
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setGeometry(QtCore.QRect(190, 210, 106, 30))
+        self.pushButton.setObjectName("pushButton")
+        self.uText = QtWidgets.QTextEdit(self.centralwidget)
+        self.uText.setGeometry(QtCore.QRect(130, 110, 221, 31))
+        self.uText.setObjectName("uText")
+
+        self.yText = QtWidgets.QTextEdit(self.centralwidget)
+        self.yText.setGeometry(QtCore.QRect(130, 160, 221, 31))
+        self.yText.setObjectName("yText")
+
+        self.AText = QtWidgets.QTextEdit(self.centralwidget)
+        self.AText.setGeometry(QtCore.QRect(430, 50, 41, 41))
+        self.AText.setObjectName("AText")
+        self.TText = QtWidgets.QTextEdit(self.centralwidget)
+        self.TText.setGeometry(QtCore.QRect(430, 150, 41, 41))
+        self.TText.setObjectName("TText")
+        mat_model.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(mat_model)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 527, 26))
+        self.menubar.setObjectName("menubar")
+        mat_model.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(mat_model)
+        self.statusbar.setObjectName("statusbar")
+        mat_model.setStatusBar(self.statusbar)
+
+        self.retranslateUi(mat_model)
+        QtCore.QMetaObject.connectSlotsByName(mat_model)
+
+    def retranslateUi(self, mat_model):
+        _translate = QtCore.QCoreApplication.translate
+        mat_model.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.label.setText(_translate("MainWindow", "L | G ="))
+        self.label_2.setText(_translate("MainWindow", "u(x,t) ="))
+        self.label_y.setText(_translate("MainWindow", "y^ = "))
+        self.label_3.setText(_translate("MainWindow", "A ="))
+        self.label_4.setText(_translate("MainWindow", "B = "))
+        self.label_5.setText(_translate("MainWindow", "T = "))
+        self.label_6.setText(_translate("MainWindow", "Initial conditions"))
+        self.pushButton.setText(_translate("MainWindow", "Save"))

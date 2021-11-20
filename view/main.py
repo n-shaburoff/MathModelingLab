@@ -1,3 +1,4 @@
+from typing import Text
 from PyQt5 import QtWidgets, QtCore, QtGui
 
 from uis.mode import Ui_MainWindow as Mode
@@ -6,6 +7,12 @@ from uis.ic import Ui_initial_conditions as IC
 from uis.ic import Ui_AfterButton_Clicked as AIC
 from uis.bc import AfterOk, Ui_boundaryConditions as BC
 from uis.unambiguity import Ui_Unambiguity as UNAM
+from uis.mat_mode import MainModeMathModelingUI as MMM
+from uis.ic import MainModeInitialConditionsUI as MIC
+from uis.ic import MainModeAfterOkUI as MAIC
+from uis.bc import MainModeBCUI as MBC
+from uis.bc import MainModeAfterOKBCUI as MABC
+from uis.unambiguity import MainModeUnambiguityUI as MUNAM
 
 import sys
 
@@ -16,15 +23,51 @@ class ChooseMethod(QtWidgets.QMainWindow):
         self.ui = Mode()
         self.ui.setupUi(self)
 
-        self.ui.radioButton.toggled.connect(self.OpenTestModeWindow)
-
         self.tm = TestMatModeling()
+        self.mm = MainModeMathModeling()
 
-    def OpenTestModeWindow(self):
+        self.ui.radioButton.toggled.connect(self.OpenModeWindow)
+        self.ui.radioButton_2.toggled.connect(self.OpenModeWindow)
+
+    def OpenModeWindow(self):
         radioButton = self.sender()
-        if radioButton.isChecked():
+        if radioButton.isChecked() and radioButton.text() == "Тестовий":
             self.tm.show()
             self.close()
+        else:
+            self.mm.show()
+            self.close()
+
+class MainModeMathModeling(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(MainModeMathModeling, self).__init__()
+
+        #ui
+        self.ui = MMM()
+        self.ui.setupUi(self)
+
+        #initial conditions
+        self.ic = MainModeInitialConditions()
+
+        # math model
+        self.model = Model()
+
+
+        self.ui.pushButton.clicked.connect(self.saveValuesAndOpenMainIC)
+
+    def saveValuesAndOpenMainIC(self):
+        self.model.L = str(self.ui.comboBox.currentText())
+        self.model.U = str(self.ui.uText.toPlainText())
+        self.model.A = str(self.ui.AText.toPlainText())
+        self.model.B = str(self.ui.BText.toPlainText())
+        self.model.T = str(self.ui.TText.toPlainText())
+        self.model.Y = str(self.ui.yText.toPlainText())
+
+        print(self.model)
+
+        self.ic.show()
+        self.close()
+
 
 class TestMatModeling(QtWidgets.QMainWindow):
     def __init__(self):
@@ -54,12 +97,13 @@ class TestMatModeling(QtWidgets.QMainWindow):
         self.ic.show()
         self.close()
 
-class InitialConditions(QtWidgets.QMainWindow):
+class MainModeInitialConditions(QtWidgets.QMainWindow):
     def __init__(self):
-        super(InitialConditions, self).__init__()
-        self.ui = IC()
-        self.aui = AIC()
-        self.bc = BoundaryConditions()
+        super(MainModeInitialConditions, self).__init__()
+        self.ui = MIC()
+        self.aui = MAIC()
+
+        self.bc = MainModeBC()
 
         self.conNumber = ''
         self.dotsNumber = ''
@@ -67,7 +111,6 @@ class InitialConditions(QtWidgets.QMainWindow):
         self.model = Model()
 
         self.startInitialUI()
-
 
     def saveAndOpenBC(self):
         # getting L0
@@ -102,6 +145,108 @@ class InitialConditions(QtWidgets.QMainWindow):
     def startAfterUI(self):
         self.aui.setupUi(self)
         self.aui.sb.clicked.connect(self.saveAndOpenBC)
+
+
+class InitialConditions(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(InitialConditions, self).__init__()
+        self.ui = IC()
+        self.aui = AIC()
+        self.bc = BoundaryConditions()
+
+        self.conNumber = ''
+        self.dotsNumber = ''
+
+        self.model = Model()
+
+        self.startInitialUI()
+
+    def saveAndOpenBC(self):
+        # getting L0
+        for i in range(int(self.conNumber)):
+            for j in range(1):
+                self.model.L0.append(str(self.aui.l_inputs[i][j].toPlainText()))
+
+        # getting X0
+        for i in range(1):
+            for j in range(int(self.dotsNumber)):
+                self.model.X0.append(str(self.aui.inputs[i][j].toPlainText()))
+
+        # getting Y0
+        for i in range(int(self.conNumber)):
+            self.model.Y0.append([])
+            for j in range(int(self.dotsNumber)):
+                self.model.Y0[i].append(str(self.aui.inputs_y[i][j].toPlainText()))
+
+        print(self.model)
+
+        self.bc.show()
+        self.close()
+
+    def getValues(self):
+        self.conNumber = str(self.ui.condNum.toPlainText())
+        self.dotsNumber = str(self.ui.dotsNum.toPlainText())
+
+    def startInitialUI(self):
+        self.ui.setupUi(self)
+        self.ui.pushButton.clicked.connect(self.startAfterUI)
+
+    def startAfterUI(self):
+        self.aui.setupUi(self)
+        self.aui.sb.clicked.connect(self.saveAndOpenBC)
+
+class MainModeBC(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(MainModeBC, self).__init__()
+        self.ui = MBC()
+        self.aui = MABC()
+
+        self.conNumber = ''
+        self.dotsNumber = ''
+
+        self.unam = MainModeUnambiguity()
+
+        self.model = Model()
+
+        self.startBeforeOkUI()
+
+    def saveValues(self):
+        # getting LG
+        for i in range(int(self.conNumber)):
+            for j in range(1):
+                self.model.LG.append(str(self.aui.l_inputs[i][j].toPlainText()))
+
+        # getting XG
+        for i in range(1):
+            for j in range(int(self.dotsNumber)):
+                self.model.XG.append(str(self.aui.inputs[i][j].toPlainText()))
+
+        # getting TG
+        for i in range(1):
+            for j in range(int(self.dotsNumber)):
+                self.model.TG.append(str(self.aui.inputs_t[i][j].toPlainText()))
+
+        # getting YG
+        for i in range(int(self.conNumber)):
+            self.model.YG.append([])
+            for j in range(int(self.dotsNumber)):
+                self.model.YG[i].append(str(self.aui.inputs_y[i][j].toPlainText()))
+
+        print(self.model)
+        self.unam.show()
+        self.close()
+
+    def startBeforeOkUI(self):
+        self.ui.setupUi(self)
+        self.ui.pushButton.clicked.connect(self.startAfterOkUI)
+
+    def startAfterOkUI(self):
+        self.aui.setupUi(self)
+        self.aui.sb.clicked.connect(self.saveValues)
+
+    def getValues(self):
+        self.conNumber = str(self.ui.condNumb.toPlainText())
+        self.dotsNumber = str(self.ui.dotsNumb.toPlainText())
 
 class BoundaryConditions(QtWidgets.QMainWindow):
     def __init__(self):
@@ -156,6 +301,12 @@ class BoundaryConditions(QtWidgets.QMainWindow):
         self.conNumber = str(self.ui.condNumb.toPlainText())
         self.dotsNumber = str(self.ui.dotsNumb.toPlainText())
 
+class MainModeUnambiguity(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(MainModeUnambiguity, self).__init__()
+        self.ui = MUNAM()
+        self.ui.setupUi(self)
+
 class Unambiguity(QtWidgets.QMainWindow):
     def __init__(self):
         super(Unambiguity, self).__init__()
@@ -180,7 +331,7 @@ class Model():
         self.TG = []
 
     def __str__(self):
-        return f'A: {self.A},B :{self.B},U: {self.U},y^ = {self.Y},G: {self.G},L: {self.L},T: {self.T},L0: {self.L0}, X0: {self.X0}, Y0: {self.Y0},LG: {self.LG}, XG: {self.XG},TG: {self.TG}, YG: {self.YG}'
+        return f'A: {self.A},B :{self.B},U: {self.U},y^: {self.Y},G: {self.G},L: {self.L},T: {self.T},L0: {self.L0}, X0: {self.X0}, Y0: {self.Y0},LG: {self.LG}, XG: {self.XG},TG: {self.TG}, YG: {self.YG}'
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
