@@ -1,30 +1,31 @@
 from typing import Text
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-from uis.mode import Ui_MainWindow as Mode
-from uis.mat_mode import Ui_MainWindow as MM
-from uis.ic import Ui_initial_conditions as IC
-from uis.ic import Ui_AfterButton_Clicked as AIC
-from uis.bc import AfterOk, Ui_boundaryConditions as BC
-from uis.unambiguity import Ui_Unambiguity as UNAM
-from uis.mat_mode import MainModeMathModelingUI as MMM
-from uis.ic import MainModeInitialConditionsUI as MIC
-from uis.ic import MainModeAfterOkUI as MAIC
-from uis.bc import MainModeBCUI as MBC
-from uis.bc import MainModeAfterOKBCUI as MABC
-from uis.unambiguity import MainModeUnambiguityUI as MUNAM
+from view.uis.mode import Ui_MainWindow as Mode
+from view.uis.mat_mode import Ui_MainWindow as MM
+from view.uis.ic import Ui_initial_conditions as IC
+from view.uis.ic import Ui_AfterButton_Clicked as AIC
+from view.uis.bc import AfterOk, Ui_boundaryConditions as BC
+from view.uis.unambiguity import Ui_Unambiguity as UNAM
+from view.uis.mat_mode import MainModeMathModelingUI as MMM
+from view.uis.ic import MainModeInitialConditionsUI as MIC
+from view.uis.ic import MainModeAfterOkUI as MAIC
+from view.uis.bc import MainModeBCUI as MBC
+from view.uis.bc import MainModeAfterOKBCUI as MABC
+from view.uis.unambiguity import MainModeUnambiguityUI as MUNAM
+from model.main import Model
 
 import sys
 
 
 class ChooseMethod(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model):
         super(ChooseMethod, self).__init__()
         self.ui = Mode()
         self.ui.setupUi(self)
 
-        self.tm = TestMatModeling()
-        self.mm = MainModeMathModeling()
+        self.tm = TestMatModeling(model)
+        self.mm = MainModeMathModeling(model)
 
         self.ui.radioButton.toggled.connect(self.OpenModeWindow)
         self.ui.radioButton_2.toggled.connect(self.OpenModeWindow)
@@ -39,7 +40,7 @@ class ChooseMethod(QtWidgets.QMainWindow):
             self.close()
 
 class MainModeMathModeling(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(MainModeMathModeling, self).__init__()
 
         #ui
@@ -47,10 +48,10 @@ class MainModeMathModeling(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
 
         #initial conditions
-        self.ic = MainModeInitialConditions()
+        self.ic = MainModeInitialConditions(model)
 
         # math model
-        self.model = Model()
+        self.model = model
 
 
         self.ui.pushButton.clicked.connect(self.saveValuesAndOpenMainIC)
@@ -70,7 +71,7 @@ class MainModeMathModeling(QtWidgets.QMainWindow):
 
 
 class TestMatModeling(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(TestMatModeling, self).__init__()
         # class ui
         self.ui = MM()
@@ -79,10 +80,10 @@ class TestMatModeling(QtWidgets.QMainWindow):
         self.ui.pushButton.clicked.connect(self.saveAndOpenIC)
 
         # initial conditions
-        self.ic = InitialConditions()
+        self.ic = InitialConditions(model)
 
         # mathematical model
-        self.model = Model()
+        self.model = model
 
     def saveAndOpenIC(self):
         self.model.L = str(self.ui.comboBox.currentText())
@@ -98,17 +99,17 @@ class TestMatModeling(QtWidgets.QMainWindow):
         self.close()
 
 class MainModeInitialConditions(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(MainModeInitialConditions, self).__init__()
         self.ui = MIC()
         self.aui = MAIC()
 
-        self.bc = MainModeBC()
+        self.bc = MainModeBC(model)
 
         self.conNumber = ''
         self.dotsNumber = ''
 
-        self.model = Model()
+        self.model = model
 
         self.startInitialUI()
 
@@ -148,16 +149,16 @@ class MainModeInitialConditions(QtWidgets.QMainWindow):
 
 
 class InitialConditions(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(InitialConditions, self).__init__()
         self.ui = IC()
         self.aui = AIC()
-        self.bc = BoundaryConditions()
+        self.bc = BoundaryConditions(model)
 
         self.conNumber = ''
         self.dotsNumber = ''
 
-        self.model = Model()
+        self.model = model
 
         self.startInitialUI()
 
@@ -196,7 +197,7 @@ class InitialConditions(QtWidgets.QMainWindow):
         self.aui.sb.clicked.connect(self.saveAndOpenBC)
 
 class MainModeBC(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(MainModeBC, self).__init__()
         self.ui = MBC()
         self.aui = MABC()
@@ -206,7 +207,7 @@ class MainModeBC(QtWidgets.QMainWindow):
 
         self.unam = MainModeUnambiguity()
 
-        self.model = Model()
+        self.model = model
 
         self.startBeforeOkUI()
 
@@ -249,7 +250,7 @@ class MainModeBC(QtWidgets.QMainWindow):
         self.dotsNumber = str(self.ui.dotsNumb.toPlainText())
 
 class BoundaryConditions(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(BoundaryConditions, self).__init__()
         self.ui = BC()
         self.aui = AfterOk()
@@ -259,7 +260,7 @@ class BoundaryConditions(QtWidgets.QMainWindow):
 
         self.unam = Unambiguity()
 
-        self.model = Model()
+        self.model = model
 
         self.startBeforeOkUI()
 
@@ -313,28 +314,8 @@ class Unambiguity(QtWidgets.QMainWindow):
         self.ui = UNAM()
         self.ui.setupUi(self)
 
-class Model():
-    def __init__(self):
-        self.A = ""
-        self.B = ""
-        self.U = ""
-        self.Y = ""
-        self.G = ""
-        self.L = ""
-        self.T = ""
-        self.L0 = []
-        self.LG = []
-        self.X0 = []
-        self.XG = []
-        self.Y0 = []
-        self.YG = []
-        self.TG = []
-
-    def __str__(self):
-        return f'A: {self.A},B :{self.B},U: {self.U},y^: {self.Y},G: {self.G},L: {self.L},T: {self.T},L0: {self.L0}, X0: {self.X0}, Y0: {self.Y0},LG: {self.LG}, XG: {self.XG},TG: {self.TG}, YG: {self.YG}'
-
-if __name__ == "__main__":
+def start(model):
     app = QtWidgets.QApplication(sys.argv)
-    w = ChooseMethod()
+    w = ChooseMethod(model)
     w.show()
     sys.exit(app.exec_())
