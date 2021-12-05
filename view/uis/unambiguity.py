@@ -26,12 +26,12 @@ class Ui_Unambiguity(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(20, 80, 31, 21))
         self.label_2.setObjectName("label_2")
-        self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit.setGeometry(QtCore.QRect(50, 70, 161, 41))
-        self.textEdit.setObjectName("textEdit")
-        self.textEdit_2 = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit_2.setGeometry(QtCore.QRect(50, 150, 161, 41))
-        self.textEdit_2.setObjectName("textEdit_2")
+        self.V0 = QtWidgets.QTextEdit(self.centralwidget)
+        self.V0.setGeometry(QtCore.QRect(50, 70, 161, 41))
+        self.V0.setObjectName("textEdit")
+        self.VG = QtWidgets.QTextEdit(self.centralwidget)
+        self.VG.setGeometry(QtCore.QRect(50, 150, 161, 41))
+        self.VG.setObjectName("textEdit_2")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(20, 160, 31, 21))
         self.label_3.setObjectName("label_3")
@@ -55,12 +55,12 @@ class Ui_Unambiguity(object):
         Unambiguity.setWindowTitle(_translate("Unambiguity", "MainWindow"))
         self.label.setText(_translate("Unambiguity", "Відповідь не однозначна, введіть вектори V0, VG для обрахунків"))
         self.label_2.setText(_translate("Unambiguity", "V0"))
-        self.textEdit.setHtml(_translate("Unambiguity", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.V0.setHtml(_translate("Unambiguity", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3*t**2+2*sin(x)</p></body></html>"))
-        self.textEdit_2.setHtml(_translate("Unambiguity", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+        self.VG.setHtml(_translate("Unambiguity", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Ubuntu\'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
@@ -84,12 +84,12 @@ class MainModeUnambiguityUI(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(20, 80, 31, 21))
         self.label_2.setObjectName("label_2")
-        self.textEdit = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit.setGeometry(QtCore.QRect(50, 70, 161, 41))
-        self.textEdit.setObjectName("textEdit")
-        self.textEdit_2 = QtWidgets.QTextEdit(self.centralwidget)
-        self.textEdit_2.setGeometry(QtCore.QRect(50, 150, 161, 41))
-        self.textEdit_2.setObjectName("textEdit_2")
+        self.V0 = QtWidgets.QTextEdit(self.centralwidget)
+        self.V0.setGeometry(QtCore.QRect(50, 70, 161, 41))
+        self.V0.setObjectName("textEdit")
+        self.VG = QtWidgets.QTextEdit(self.centralwidget)
+        self.VG.setGeometry(QtCore.QRect(50, 150, 161, 41))
+        self.VG.setObjectName("textEdit_2")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(20, 160, 31, 21))
         self.label_3.setObjectName("label_3")

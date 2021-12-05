@@ -196,3 +196,4 @@ class MainModeMathModelingUI(object):
         self.label_5.setText(_translate("MainWindow", "T = "))
         self.label_6.setText(_translate("MainWindow", "Initial conditions"))
         self.pushButton.setText(_translate("MainWindow", "Save"))
+        self.comboBox.setItemText(0, _translate("MainWindow", "d^2/dt^2 + d/dx | (x**3/sqrt(4*pi*t))"))

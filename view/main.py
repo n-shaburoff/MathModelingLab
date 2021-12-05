@@ -205,7 +205,7 @@ class MainModeBC(QtWidgets.QMainWindow):
         self.conNumber = ''
         self.dotsNumber = ''
 
-        self.unam = MainModeUnambiguity()
+        self.unam = MainModeUnambiguity(model)
 
         self.model = model
 
@@ -258,7 +258,7 @@ class BoundaryConditions(QtWidgets.QMainWindow):
         self.conNumber = ''
         self.dotsNumber = ''
 
-        self.unam = Unambiguity()
+        self.unam = Unambiguity(model)
 
         self.model = model
 
@@ -303,16 +303,38 @@ class BoundaryConditions(QtWidgets.QMainWindow):
         self.dotsNumber = str(self.ui.dotsNumb.toPlainText())
 
 class MainModeUnambiguity(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(MainModeUnambiguity, self).__init__()
         self.ui = MUNAM()
         self.ui.setupUi(self)
 
+        # math model
+        self.model = model
+
+        self.ui.pushButton.clicked.connect(self.getV0andVG)
+
+    def getV0andVG(self):
+        self.model.V0 = str(self.ui.V0.toPlainText())
+        print(self.model.V0)
+        self.model.VG = str(self.ui.VG.toPlainText())
+        print(self.model.VG)
+
 class Unambiguity(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, model = Model()):
         super(Unambiguity, self).__init__()
         self.ui = UNAM()
         self.ui.setupUi(self)
+
+        # math model
+        self.model = model
+
+        self.ui.pushButton.clicked.connect(self.getV0andVG)
+
+    def getV0andVG(self):
+        self.model.V0 = str(self.ui.V0.toPlainText())
+        print(self.model.V0)
+        self.model.VG = str(self.ui.VG.toPlainText())
+        print(self.model.VG)
 
 def start(model):
     app = QtWidgets.QApplication(sys.argv)
