@@ -5,9 +5,6 @@ from math import Math
 from MathModelingLab.main import Model
 
 
-def fun(x, y):
-    return (x ** 2 - y ** 2) - x * y
-
 class Graph():
 
     def __init__(self, model: Model, m: Math):

@@ -6,7 +6,6 @@ from MathModelingLab.model.main import Model
 
 sys.setrecursionlimit(15000)
 
-
 def calculateG():
     return sp.Heaviside((sp.Symbol('t') - sp.Symbol('h')) - sp.Abs(sp.Symbol('x') - sp.Symbol('z')))
 
