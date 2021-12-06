@@ -2,7 +2,7 @@ import scipy.integrate
 import sympy as sp
 import numpy as np
 import sys
-from MathModelingLab.model import Model
+from model import Model
 
 sys.setrecursionlimit(15000)
 
@@ -143,7 +143,7 @@ class Math():
 
                 check=sp.integrate(elemMat_expr,(sp.Symbol('h'), t0, T)).simplify()
                 check1 = sp.integrate(check, (sp.Symbol('z'), a, b))
-                
+
                 '''
                 elemMat = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), elemMat_expr,
                                       modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
