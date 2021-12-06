@@ -1,19 +1,19 @@
 from typing import Text
 from PyQt5 import QtWidgets, QtCore, QtGui
 
-from view.uis.mode import Ui_MainWindow as Mode
-from view.uis.mat_mode import Ui_MainWindow as MM
-from view.uis.ic import Ui_initial_conditions as IC
-from view.uis.ic import Ui_AfterButton_Clicked as AIC
-from view.uis.bc import AfterOk, Ui_boundaryConditions as BC
-from view.uis.unambiguity import Ui_Unambiguity as UNAM
-from view.uis.mat_mode import MainModeMathModelingUI as MMM
-from view.uis.ic import MainModeInitialConditionsUI as MIC
-from view.uis.ic import MainModeAfterOkUI as MAIC
-from view.uis.bc import MainModeBCUI as MBC
-from view.uis.bc import MainModeAfterOKBCUI as MABC
-from view.uis.unambiguity import MainModeUnambiguityUI as MUNAM
-from model.main import Model
+from uis.mode import Ui_MainWindow as Mode
+from uis.mat_mode import Ui_MainWindow as MM
+from uis.ic import Ui_initial_conditions as IC
+from uis.ic import Ui_AfterButton_Clicked as AIC
+from uis.bc import AfterOk, Ui_boundaryConditions as BC
+from uis.unambiguity import Ui_Unambiguity as UNAM
+from uis.mat_mode import MainModeMathModelingUI as MMM
+from uis.ic import MainModeInitialConditionsUI as MIC
+from uis.ic import MainModeAfterOkUI as MAIC
+from uis.bc import MainModeBCUI as MBC
+from uis.bc import MainModeAfterOKBCUI as MABC
+from uis.unambiguity import MainModeUnambiguityUI as MUNAM
+from model import Model
 
 import sys
 
@@ -335,9 +335,11 @@ class Unambiguity(QtWidgets.QMainWindow):
         print(self.model.V0)
         self.model.VG = str(self.ui.VG.toPlainText())
         print(self.model.VG)
+        self.close()
+
 
 def start(model):
     app = QtWidgets.QApplication(sys.argv)
     w = ChooseMethod(model)
     w.show()
-    sys.exit(app.exec_())
+    app.exec_()

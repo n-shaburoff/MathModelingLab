@@ -1,8 +1,8 @@
-from model.main import Model
-from view.main import start as viewStart
+import model
+import view
 import controller
 
 if __name__ == "__main__":
-    model = Model()
-    viewStart(model)
+    model = model.Model()
+    view.start(model)
     controller.startCalculation(model)

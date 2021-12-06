@@ -2,7 +2,7 @@ import scipy.integrate
 import sympy as sp
 import numpy as np
 import sys
-from MathModelingLab.model.main import Model
+from MathModelingLab.model import Model
 
 sys.setrecursionlimit(15000)
 
@@ -33,19 +33,19 @@ class Math():
     def __init__(self, model: Model):
         self.L = model.L
         self.u = sp.parse_expr(model.U)
-        self.a = model.A
-        self.b = model.B
-        self.T = model.T
+        self.a = float(model.A)
+        self.b = float(model.B)
+        self.T = float(model.T)
         self.LG = model.LG
         self.L0 = model.L0
-        self.XG = np.array(model.XG)
-        self.X0 = np.array(model.X0)
-        self.Y0 = np.array(model.Y0)
-        self.YG = np.array(model.YG)
-        self.TG = np.array(model.TG)
+        self.XG = np.array(model.XG).astype('float64')
+        self.X0 = np.array(model.X0).astype('float64')
+        self.Y0 = np.array(model.Y0).astype('float64')
+        self.YG = np.array(model.YG).astype('float64')
+        self.TG = np.array(model.TG).astype('float64')
         self.v0 = model.VO
         self.vG = model.VG
-        self.G = calculateG()
+        self.G = sp.Heaviside((sp.Symbol('t') - sp.Symbol('h')) - sp.Abs(sp.Symbol('x') - sp.Symbol('z')))
 
     ##Search Yinf
     def searchYinf(self, x, t):
@@ -173,8 +173,8 @@ class Math():
 
     ## search Av
     def searchAv0(self, A):
-        v0 = sp.parse_expr(self.v0)
-        vG = sp.parse_expr(self.vG)
+        v0 = 0
+        vG = 0
         A1_dot = np.dot(A[0][0], v0)
         A2_dot = np.dot(A[0][1], vG)
         A3_dot = np.dot(A[0][1], vG)
@@ -188,8 +188,8 @@ class Math():
         return Av0
 
     def searchAvG(self, A):
-        v0 = sp.parse_expr(self.v0)
-        vG = sp.parse_expr(self.vG)
+        v0 = 0
+        vG = 0
         A1_dot = np.dot(A[1][0], v0)
         A2_dot = np.dot(A[1][1], vG)
         A3_dot = np.dot(A[1][1], vG)
@@ -237,7 +237,7 @@ class Math():
     ## search u0 and uG
     def searchU0(self):
         A0 = self.searchA0()
-        v0 = sp.parse_expr(self.v0)
+        v0 = 0
         P = self.P
         U0 = np.dot(np.dot(A0, np.linalg.pinv(P)), (self.Ys - self.Av)) + v0
 
@@ -245,7 +245,7 @@ class Math():
 
     def searchUG(self):
         AG = self.searchAG()
-        vG = sp.parse_expr(self.vG)
+        vG = 0
         P = self.P
         UG = np.dot(np.dot(AG, np.linalg.pinv(P)), (self.Ys - self.Av)) + vG
         return UG
@@ -253,8 +253,8 @@ class Math():
     def searchU(self):
         A = self.makeA()
         P = self.P
-        vG = sp.parse_expr(self.vG)
-        v0 = sp.parse_expr(self.v0)
+        vG = 0
+        v0 = 0
         v = np.array([[v0], [vG]])
         U = np.dot(np.dot(np.transpose(A), np.linalg.pinv(P)), (self.Ys - self.Av)) + v
         return U
