@@ -2,14 +2,12 @@ import scipy.integrate
 import sympy as sp
 import numpy as np
 import sys
-from model.main import Model
+from MathModelingLab.model.main import Model
 
 sys.setrecursionlimit(15000)
 
-
 def calculateG():
-    return sp.exp(-1 * (sp.Symbol('x') - sp.Symbol('z')) ** 2 / (4 * (sp.Symbol('t') - sp.Symbol('h')))) / sp.sqrt(
-        4 * sp.pi * (sp.Symbol('t') - sp.Symbol('h')))
+    return sp.Heaviside((sp.Symbol('t') - sp.Symbol('h')) - sp.Abs(sp.Symbol('x') - sp.Symbol('z')))
 
 
 class Math():
@@ -26,7 +24,8 @@ class Math():
     L0 = None
     LG = None
     YG = None
-    C = float(99)
+    C = float(10)
+    Tm = -0.001
     P = None
     Av = None
     Ys = None
@@ -44,19 +43,19 @@ class Math():
         self.Y0 = np.array(model.Y0)
         self.YG = np.array(model.YG)
         self.TG = np.array(model.TG)
-        self.v0 = model.V0
+        self.v0 = model.VO
         self.vG = model.VG
         self.G = calculateG()
 
     ##Search Yinf
     def searchYinf(self, x, t):
-        G_lamda = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G, 'numpy')
+        G = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G,
+                        modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
         u = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), self.u, 'numpy')
-
-        G = lambda x, t, z, h: 0 if t - h <= 0 else G_lamda(x, t, z, h)
         Gu = lambda z, h: G(x, t, z, h) * u(z, h)
 
-        return scipy.integrate.dblquad(Gu, self.a, self.b, 0, self.T, epsabs=10 ** (-2), epsrel=10 ** (-2))[0]
+        return scipy.integrate.dblquad(Gu, 0, self.T, lambda h: self.a, lambda h: self.b, epsabs=10 ** (-3),
+                                       epsrel=10 ** (-3))[0]
 
     ##MAKE Y
     def makeY0Vector(self):
@@ -87,14 +86,17 @@ class Math():
         return np.array([[self.makeAModulMatrix1(), self.makeAModulMatrix1()],
                          [self.makeAModulMatrix2(), self.makeAModulMatrix2()]])
 
+    def makeA(self):
+        return np.vstack([np.hstack([self.makeAModulMatrix1(), self.makeAModulMatrix1()]),
+                          np.hstack([self.makeAModulMatrix2(), self.makeAModulMatrix2()])])
+
     def makeAModulMatrix1(self):
         aModul = []
         for i in range(len(self.L0)):
             for j in range(len(self.X0)):
-                G_lamda = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G, 'numpy')
-                G = lambda x, t, z, h: 0 if t - h <= 0 else G_lamda(x, t, z, h)
                 ##aModulElement = (mt.diffOperFunc(self.L0[i], self.G)).subs(sp.Symbol('t'), 0)
-                aModulElement = lambda x, t: G(self.X0[j], 0, x, t)
+                aModulElement = self.G.subs(sp.Symbol('t'), 0)
+                aModulElement = aModulElement.subs(sp.Symbol('x'), self.X0[j])
                 aModul.append(aModulElement)
         return np.transpose(np.array(aModul, ndmin=2))
 
@@ -102,26 +104,26 @@ class Math():
         aModul = []
         for i in range(len(self.LG)):
             for j in range(len(self.TG)):
-                G_lamda = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G, 'numpy')
-                G = lambda x, t, z, h: 0 if t - h <= 0 else G_lamda(x, t, z, h)
-                ##aModulElement = (mt.diffOperFunc(self.L0[i], self.G)).subs(sp.Symbol('t'), 0)
-                aModulElement = lambda x, t: G(self.XG[j], self.TG[i], x, t)
+                ##aModulElement = (mt.diffOperFunc(self.LG[i], self.G)).subs(sp.Symbol('t'), self.TG[j])
+                aModulElement = self.G.subs(sp.Symbol('t'), self.TG[j])
+                aModulElement = aModulElement.subs(sp.Symbol('x'), self.XG[j])
                 aModul.append(aModulElement)
         return np.transpose(np.array(aModul, ndmin=2))
 
     ## Make P
 
     def searchPmodul(self, A, i, j):
-        A1_dot = self.dotMatrixFuncP(A[i - 1][0], np.transpose(A[j - 1][0]))
-        A2_dot = self.dotMatrixFuncP(A[i - 1][1], np.transpose(A[j - 1][1]))
+        A1_dot = np.dot(A[i - 1][0], np.transpose(A[j - 1][0]))
+        A2_dot = np.dot(A[i - 1][1], np.transpose(A[j - 1][1]))
+        A3_dot = np.dot(A[i - 1][1], np.transpose(A[j - 1][1]))
         ##A1_funct = lambda z, h: 0 if self.TG[j] - h <= 0 else A1_lambda(z, h)
         ##P1_funct=
         AC = self.a - self.C
         BC = self.b + self.C
-        P1 = self.searchIntegralMatrix(A1_dot, self.a, self.b, -1 * self.T, 0)
-        P2 = self.searchIntegralMatrix(A2_dot, AC, BC, 0, self.T)
-
-        Pmod = np.array(P1) + np.array(P2)
+        P1 = self.searchIntegralMatrix(A1_dot, self.a, self.b, -1 * self.C, 0)
+        P2 = self.searchIntegralMatrix(A2_dot, AC, self.a, 0, self.T)
+        P3 = self.searchIntegralMatrix(A3_dot, self.b, BC, 0, self.T)
+        Pmod = np.array(P1) + np.array(P2) + np.array(P3)
         return Pmod
 
     def searchP(self):
@@ -136,9 +138,18 @@ class Math():
         matShape = mat.shape
         for i in range(matShape[0]):
             for j in range(matShape[1]):
-                elemMat = mat[i][j]
-                interElemMat = scipy.integrate.nquad(elemMat, [[a, b], [t0, T]])[0]
+                elemMat_expr = mat[i][j].simplify()
+                '''
 
+                check=sp.integrate(elemMat_expr,(sp.Symbol('h'), t0, T)).simplify()
+                check1 = sp.integrate(check, (sp.Symbol('z'), a, b))
+                
+                '''
+                elemMat = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), elemMat_expr,
+                                      modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
+                interElemMat = \
+                scipy.integrate.dblquad(elemMat, t0, T, lambda h: a, lambda h: b, epsabs=10 ** (-3), epsrel=10 ** (-3))[
+                    0]
                 mat[i][j] = float(interElemMat)
 
         return mat
@@ -163,33 +174,32 @@ class Math():
     ## search Av
     def searchAv0(self, A):
         v0 = sp.parse_expr(self.v0)
-        v0_func = np.array([[sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), v0, 'numpy')]])
         vG = sp.parse_expr(self.vG)
-        vG_func = np.array([[sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), vG, 'numpy')]])
-        A1_dot = self.dotMatrixFuncP(A[0][0], v0_func)
-        A2_dot = self.dotMatrixFuncP(A[0][1], vG_func)
+        A1_dot = np.dot(A[0][0], v0)
+        A2_dot = np.dot(A[0][1], vG)
+        A3_dot = np.dot(A[0][1], vG)
         AC = self.a - self.C
         BC = self.b + self.C
-        A1 = self.searchIntegralMatrix(A1_dot, self.a, self.b, -1 * self.T, 0)
-        A2 = self.searchIntegralMatrix(A2_dot, AC, BC, 0, self.T)
-
-        Av0 = np.array(A1) + np.array(A2)
+        A1 = self.searchIntegralMatrix(A1_dot, self.a, self.b, -1 * self.C, 0)
+        A2 = self.searchIntegralMatrix(A2_dot, AC, self.a, 0.0001, self.T)
+        A3 = self.searchIntegralMatrix(A3_dot, self.b, BC, 0.0001, self.T)
+        Av0 = np.array(A1) + np.array(A2) + np.array(A3)
 
         return Av0
 
     def searchAvG(self, A):
         v0 = sp.parse_expr(self.v0)
-        v0_func = np.array([[sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), v0, 'numpy')]])
         vG = sp.parse_expr(self.vG)
-        vG_func = np.array([[sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), vG, 'numpy')]])
-        A1_dot = self.dotMatrixFuncP(A[1][0], v0_func)
-        A2_dot = self.dotMatrixFuncP(A[1][1], vG_func)
+        A1_dot = np.dot(A[1][0], v0)
+        A2_dot = np.dot(A[1][1], vG)
+        A3_dot = np.dot(A[1][1], vG)
         AC = self.a - self.C
         BC = self.b + self.C
-        A1 = self.searchIntegralMatrix(A1_dot, self.a, self.b, -1 * self.T, 0)
-        A2 = self.searchIntegralMatrix(A2_dot, AC, BC, 0, self.T)
+        A1 = self.searchIntegralMatrix(A1_dot, self.a, self.b, -1 * self.C, 0)
+        A2 = self.searchIntegralMatrix(A2_dot, AC, self.a, 0.0001, self.T)
+        A3 = self.searchIntegralMatrix(A3_dot, self.b, BC, 0.0001, self.T)
 
-        AvG = np.array(A1) + np.array(A2)
+        AvG = np.array(A1) + np.array(A2) + np.array(A3)
 
         return AvG
 
@@ -200,40 +210,14 @@ class Math():
 
     ## search Av A0
 
-    def searchA0(self, x, t):
+    def searchA0(self):
         A = self.makeAMatrix()
-
-        A_1 = A[0][0]
-        A1Shape = np.shape(A_1)
-        for i in range(A1Shape[0]):
-            for j in range(A1Shape[1]):
-                A_1[i][j] = A_1[i][j](x, t)
-
-        A_2 = A[1][0]
-        A2Shape = np.shape(A_2)
-        for i in range(A2Shape[0]):
-            for j in range(A2Shape[1]):
-                A_2[i][j] = A_2[i][j](x, t)
-
-        A0 = np.concatenate((np.transpose(A_1), np.transpose(A_2)), axis=1)
+        A0 = np.concatenate((np.transpose(A[0][0]), np.transpose(A[1][0])), axis=1)
         return A0
 
-    def searchAG(self, x, t):
-
+    def searchAG(self):
         A = self.makeAMatrix()
-        A_1 = A[0][1]
-        A1Shape = np.shape(A_1)
-        for i in range(A1Shape[0]):
-            for j in range(A1Shape[1]):
-                A_1[i][j] = A_1[i][j](x, t)
-
-        A_2 = A[1][1]
-        A2Shape = np.shape(A_2)
-        for i in range(A2Shape[0]):
-            for j in range(A2Shape[1]):
-                A_2[i][j] = A_2[i][j](x, t)
-
-        AG = np.concatenate((np.transpose(A_1), np.transpose(A_2)), axis=1)
+        AG = np.concatenate((np.transpose(A[0][1]), np.transpose(A[1][1])), axis=1)
         return AG
 
     ## init P and Av
@@ -243,28 +227,37 @@ class Math():
         self.P = self.P.astype('float64')
         print(self.P)
         print('stop P')
-        self.Av = self.searchAv()
+        self.Av = self.searchAv().astype('float64')
+        print(self.Av)
         print('stop Av')
-        self.Ys = self.makeYsVector()
+        self.Ys = self.makeYsVector().astype('float64')
+        print(self.Ys)
         print('stop Ys')
 
     ## search u0 and uG
-    def searchU0(self, x, t):
-        A0 = self.searchA0(x, t)
+    def searchU0(self):
+        A0 = self.searchA0()
         v0 = sp.parse_expr(self.v0)
-        v0_func = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), v0, 'numpy')
         P = self.P
-        U0 = np.dot(np.dot(A0, np.linalg.pinv(P)), (self.Ys - self.Av)) + v0_func(x, t)
+        U0 = np.dot(np.dot(A0, np.linalg.pinv(P)), (self.Ys - self.Av)) + v0
 
         return U0
 
-    def searchUG(self, x, t):
-        AG = self.searchAG(x, t)
+    def searchUG(self):
+        AG = self.searchAG()
         vG = sp.parse_expr(self.vG)
-        vG_func = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), vG, 'numpy')
         P = self.P
-        UG = np.dot(np.dot(AG, np.linalg.pinv(P)), (self.Ys - self.Av)) + vG_func(x, t)
+        UG = np.dot(np.dot(AG, np.linalg.pinv(P)), (self.Ys - self.Av)) + vG
         return UG
+
+    def searchU(self):
+        A = self.makeA()
+        P = self.P
+        vG = sp.parse_expr(self.vG)
+        v0 = sp.parse_expr(self.v0)
+        v = np.array([[v0], [vG]])
+        U = np.dot(np.dot(np.transpose(A), np.linalg.pinv(P)), (self.Ys - self.Av)) + v
+        return U
 
     ## check det
     def chechInd(self):
@@ -272,25 +265,36 @@ class Math():
 
     ## search Y0 YG and Y
     def searchY0(self, x, t):
-        G_lamda = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G, 'numpy')
-        u = lambda x, t: self.searchU0(x, t)[0][0]
-        G = lambda x, t, z, h: 0 if t - h <= 0 else G_lamda(x, t, z, h)
+        G = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G,
+                        modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
+        u0 = self.searchU0()[0][0].simplify()
+
+        u = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), u0,
+                        modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
         Gu = lambda z, h: G(x, t, z, h) * u(z, h)
 
-        return scipy.integrate.dblquad(Gu, self.a, self.b, -1 * self.T, 0, epsabs=10 ** (-2), epsrel=10 ** (-2))[0]
+        return scipy.integrate.dblquad(Gu, self.Tm, 0, lambda h: self.a, lambda h: self.b, epsabs=10 ** (-3),
+                                       epsrel=10 ** (-3))[0]
 
     def searchYG(self, x, t):
-        G_lamda = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G, 'numpy')
-        u = lambda x, t: self.searchUG(x, t)[0][0]
-        G = lambda x, t, z, h: 0 if t - h <= 0 else G_lamda(x, t, z, h)
-        Gu = lambda z, h: G(x, t, z, h) * u(z, h)
+        G = sp.lambdify((sp.Symbol('x'), sp.Symbol('t'), sp.Symbol('z'), sp.Symbol('h')), self.G,
+                        modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
+        uG = self.searchUG()[0][0].simplify()
 
-        return scipy.integrate.dblquad(Gu, self.a - self.C, self.a, 0, self.T, epsabs=10 ** (-2), epsrel=10 ** (-2))[
-                   0] + \
-               scipy.integrate.dblquad(Gu, self.b, self.b + self.C, 0, self.T, epsabs=10 ** (-2), epsrel=10 ** (-2))[0]
+        u = sp.lambdify((sp.Symbol('z'), sp.Symbol('h')), uG,
+                        modules=['numpy', {'Heaviside': lambda arg: np.heaviside(arg, 1), 'Abs': np.abs}])
+        Gu = lambda z, h: G(x, t, z, h) * u(z, h)
+        AC = self.a - self.C
+        BC = self.b + self.C
+        YG2 = \
+        scipy.integrate.dblquad(Gu, 0, self.T, lambda h: AC, lambda h: self.a, epsabs=10 ** (-4), epsrel=10 ** (-4))[0]
+        YG1 = \
+        scipy.integrate.dblquad(Gu, 0, self.T, lambda h: self.b, lambda h: BC, epsabs=10 ** (-3), epsrel=10 ** (-3))[0]
+
+        return YG1 + YG2
 
     def searchY(self, x, t):
-        if (self.P == None):
+        if (self.P.all() == None):
             self.initPandAv()
         y_inf = self.searchYinf(x, t)
         print(y_inf)
@@ -298,5 +302,10 @@ class Math():
         print(yG)
         y0 = self.searchY0(x, t)
         print(y0)
-        Y = y_inf + y0 + yG
+        Y = y_inf + yG + y0
         return Y
+
+    def searchAccuracy(self):
+        Ys = self.makeYsVector()
+        P = self.searchP().astype('float64')
+        return np.dot(np.transpose(Ys), Ys) - np.dot(np.dot(np.transpose(Ys), P), np.dot(np.linalg.pinv(P), Ys))
