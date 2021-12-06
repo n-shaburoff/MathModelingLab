@@ -4,6 +4,30 @@ import sympy as smp
 from MathModelingLab.math import Math
 from MathModelingLab.model import Model
 
+class Plotter:
+    def init(self, xmin, xmax, tmax):
+        self.xmin = float(xmin)
+        self.xmax = float(xmax)
+        self.tmax = float(tmax)
+
+    def plot_3d(self, func1, func2, title=''):
+        n = 5
+        x = np.linspace(self.xmin, self.xmax, n)
+        t = np.linspace(0, self.tmax, n + 1)
+
+        z_mesh = [[func1(xi, ti)for xi in x] for ti in t]
+        z_mesh2 = [[func2(xi, ti)for xi in x] for ti in t]
+
+        fig = go.Figure(data=[go.Surface(z=z_mesh, x=x, y=t)])
+        fig = go.Figure(data=[go.Surface(z=z_mesh2, x=x, y=t)])
+
+        fig.update_layout(title=title, scene=dict(
+            xaxis_title='X',
+            yaxis_title='T',
+            zaxis_title='Y(X, T)'))
+
+        fig.show()
+
 
 class Graph():
 
