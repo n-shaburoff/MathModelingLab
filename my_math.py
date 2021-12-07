@@ -25,7 +25,7 @@ class Math():
     LG = None
     YG = None
     C = float(10)
-    Tm = -0.001
+    Tm = -0.01
     P = None
     Av = None
     Ys = None

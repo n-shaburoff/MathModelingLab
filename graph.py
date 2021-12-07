@@ -1,5 +1,42 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+class Plotter:
+    def __init__(self, xmin, xmax, tmax):
+        self.xmin = float(xmin)
+        self.xmax = float(xmax)
+        self.tmax = float(tmax)
+
+    def plot_3d(self, func1, func2, title=''):
+        fig = plt.figure()
+
+        # #plot first
+        ax = fig.add_subplot(111, projection='3d')
+        x = np.array(np.linspace(self.xmin, self.xmax, 6))
+        t = np.array(np.linspace(0, self.tmax, 6))
+        X, Y = np.meshgrid(x, t)
+
+        z_mesh = np.array([[func1(xi, ti) for xi in x] for ti in x])
+        z_mesh2 = np.array([[func2(xi, ti) for xi in x] for ti in t])
+
+        Z = z_mesh.reshape(X.shape)
+        Z2 = z_mesh2.reshape(X.shape)
+
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('T Label')
+        ax.set_zlabel('Y Label')
+
+        # plot second
+
+        ax.plot_surface(X, Y, Z)
+        ax.plot_surface(X, Y, Z2, alpha=0.5)
+
+        plt.show()
+
+'''
+import matplotlib.pyplot as plt
+import numpy as np
 import sympy as smp
 import plotly.graph_objects as go
 
@@ -33,7 +70,7 @@ class Plotter:
         fig1.show()
         fig2.show()
 
-
+'''
 # class Graph():
 
 #     def __init__(self, model: Model, m: Math):
