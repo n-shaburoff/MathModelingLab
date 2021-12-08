@@ -14,8 +14,8 @@ class Model():
         self.Y0 = []
         self.YG = []
         self.TG = []
-        self.VO = ""
+        self.V0 = ""
         self.VG = ""
 
     def __str__(self):
-        return f'A: {self.A},B :{self.B},U: {self.U},y^: {self.Y},G: {self.G},L: {self.L},T: {self.T},L0: {self.L0}, X0: {self.X0}, Y0: {self.Y0},LG: {self.LG}, XG: {self.XG},TG: {self.TG}, YG: {self.YG},VG: {self.VG},  V0: {self.VO}'
+        return f'A: {self.A},B :{self.B},U: {self.U},y^: {self.Y},G: {self.G},L: {self.L},T: {self.T},L0: {self.L0}, X0: {self.X0}, Y0: {self.Y0},LG: {self.LG}, XG: {self.XG},TG: {self.TG}, YG: {self.YG},VG: {self.VG},  V0: {self.V0}'

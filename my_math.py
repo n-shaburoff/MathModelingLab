@@ -43,8 +43,8 @@ class Math():
         self.Y0 = np.array(model.Y0).astype('float64')
         self.YG = np.array(model.YG).astype('float64')
         self.TG = np.array(model.TG).astype('float64')
-        self.v0 = model.VO
-        self.vG = model.VG
+        self.v0 = sp.parse_expr(model.V0)
+        self.vG = sp.parse_expr(model.VG)
         self.G = sp.Heaviside((sp.Symbol('t') - sp.Symbol('h')) - sp.Abs(sp.Symbol('x') - sp.Symbol('z')))
 
     ##Search Yinf
@@ -173,8 +173,8 @@ class Math():
 
     ## search Av
     def searchAv0(self, A):
-        v0 = 0
-        vG = 0
+        v0 = self.v0
+        vG = self.vG
         A1_dot = np.dot(A[0][0], v0)
         A2_dot = np.dot(A[0][1], vG)
         A3_dot = np.dot(A[0][1], vG)
@@ -188,8 +188,8 @@ class Math():
         return Av0
 
     def searchAvG(self, A):
-        v0 = 0
-        vG = 0
+        v0 = self.v0
+        vG = self.vG
         A1_dot = np.dot(A[1][0], v0)
         A2_dot = np.dot(A[1][1], vG)
         A3_dot = np.dot(A[1][1], vG)
@@ -237,7 +237,7 @@ class Math():
     ## search u0 and uG
     def searchU0(self):
         A0 = self.searchA0()
-        v0 = 0
+        v0 = self.v0
         P = self.P
         U0 = np.dot(np.dot(A0, np.linalg.pinv(P)), (self.Ys - self.Av)) + v0
 
@@ -245,7 +245,7 @@ class Math():
 
     def searchUG(self):
         AG = self.searchAG()
-        vG = 0
+        vG = self.vG
         P = self.P
         UG = np.dot(np.dot(AG, np.linalg.pinv(P)), (self.Ys - self.Av)) + vG
         return UG
@@ -309,3 +309,38 @@ class Math():
         Ys = self.makeYsVector()
         P = self.searchP().astype('float64')
         return np.dot(np.transpose(Ys), Ys) - np.dot(np.dot(np.transpose(Ys), P), np.dot(np.linalg.pinv(P), Ys))
+
+
+    def checkDet(self):
+        A=self.makeA()
+
+        AShape = A.shape
+        k=3
+        t=np.linspace(0, self.T, k)
+        x = np.linspace(self.a, self.b, k)
+        det2 = []
+        z = sp.Symbol('z')
+        h=sp.Symbol('h')
+        for i in range(k):
+            det1 = []
+            for j in range(k):
+                A1=self.makeA()
+                A2=self.makeA()
+                for m in range(AShape[0]):
+                    for n in range(AShape[1]):
+                        A2[m][n] = A2[m][n].subs(h, t[i])
+                        A1[m][n] = A1[m][n].subs(h, t[j])
+                        A2[m][n] = A2[m][n].subs(z, x[i])
+                        A1[m][n] = A1[m][n].subs(z, x[j])
+                if (j == 0):
+                    det1 = np.dot(np.transpose(A2), A1)
+                else:
+                    det1 = np.concatenate((det1, np.dot(np.transpose(A2), A1)), axis=1)
+            if (i == 0):
+                det2 = det1
+            else:
+                det2 = np.concatenate((det2, det1), axis=0)
+        if (np.linalg.det(det2.astype('float64')) > 0):
+            return True
+        return False
+
